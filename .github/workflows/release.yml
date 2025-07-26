@@ -43,6 +43,7 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
+          sudo apt-get install -y software-properties-common
           sudo apt-get install -y \
             libwebkit2gtk-4.0-dev \
             build-essential \
@@ -70,7 +71,18 @@ jobs:
             libxfixes-dev \
             libxrandr-dev \
             libgbm-dev \
-            libxss-dev
+            libxss-dev \
+            libatk-bridge2.0-dev \
+            libatspi2.0-dev \
+            libgdk-pixbuf2.0-dev \
+            libglib2.0-dev \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libgirepository1.0-dev \
+            libgstreamer1.0-dev \
+            libgstreamer-plugins-base1.0-dev
+          sudo apt-get clean
+          sudo apt-get autoremove -y
 
       - name: Install dependencies (macOS)
         if: matrix.platform == 'macos-latest'
@@ -96,6 +108,8 @@ jobs:
         run: npm run tauri build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig
+          LD_LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
 
       - name: Upload artifacts (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
