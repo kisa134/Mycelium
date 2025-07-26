@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
           cache: 'npm'
 
       - name: Install Rust toolchain
@@ -47,47 +47,11 @@ jobs:
             libgtk-3-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
-<<<<<<< HEAD
-            pkg-config \
-            libappindicator3-dev \
-            libdbus-1-dev \
-            libx11-dev \
-            libxcb1-dev \
-            libxrandr-dev \
-            libxss-dev \
-            libxtst-dev \
-            libnss3-dev \
-            libcups2-dev \
-            libasound2-dev \
-            libpulse-dev \
-            libdrm-dev \
-            libxcomposite-dev \
-            libxdamage-dev \
-            libxfixes-dev \
-            libgbm-dev \
-            libatk-bridge2.0-dev \
-            libatspi2.0-dev \
-            libgdk-pixbuf2.0-dev \
-            libglib2.0-dev \
-            libcairo2-dev \
-            libpango1.0-dev \
-            libgirepository1.0-dev \
-            libgstreamer1.0-dev \
-            libgstreamer-plugins-base1.0-dev
-
-      - name: Install dependencies (macOS)
-        if: matrix.platform == 'macos-latest'
-        run: |
-          brew install jq
-          xcode-select --install || true
-=======
             pkg-config
->>>>>>> f728a14288870cb2c5a057a99215796404ff0c75
 
       - name: Install dependencies (Windows)
         if: matrix.platform.os == 'windows-latest'
         run: |
-          # Install WebView2
           curl -L -o MicrosoftEdgeWebview2Setup.exe https://go.microsoft.com/fwlink/p/?LinkId=2124703
           ./MicrosoftEdgeWebview2Setup.exe /silent /install
 
@@ -98,19 +62,10 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-<<<<<<< HEAD
-          PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig
-          LD_LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
-
-      - name: Upload artifacts (Ubuntu)
-        if: matrix.platform == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-=======
->>>>>>> f728a14288870cb2c5a057a99215796404ff0c75
         with:
-          tagName: ${{ github.ref_name }} # Это берет имя тега (например, v0.1.0)
-          releaseName: 'Mycelium Node v__VERSION__' # __VERSION__ будет заменено на версию
-          releaseBody: 'Первый стабильный релиз ноды Mycelium. Подробности в коммитах.'
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Mycelium Node v__VERSION__'
+          releaseBody: 'Первый стабильный релиз ноды Mycelium. Этот релиз был создан автоматически.'
           releaseDraft: false
           prerelease: false
 
