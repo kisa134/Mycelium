@@ -55,17 +55,49 @@ jobs:
           curl -L -o MicrosoftEdgeWebview2Setup.exe https://go.microsoft.com/fwlink/p/?LinkId=2124703
           ./MicrosoftEdgeWebview2Setup.exe /silent /install
 
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+
       - name: Install frontend dependencies
         run: npm install
 
       - name: Build with Tauri
-        uses: tauri-apps/tauri-action@v0
+        run: npm run tauri build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'Mycelium Node v__VERSION__'
-          releaseBody: 'Первый стабильный релиз ноды Mycelium. Этот релиз был создан автоматически.'
-          releaseDraft: false
+          name: release-${{ matrix.platform.os }}
+          path: src-tauri/target/release/
+          if-no-files-found: error
+
+  create-release:
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/release-macos-latest/**/*
+            artifacts/release-ubuntu-latest/**/*
+            artifacts/release-windows-latest/**/*
+          draft: false
           prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
