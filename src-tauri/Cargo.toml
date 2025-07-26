@@ -22,7 +22,6 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-libp2p = { version = "0.53", features = ["tokio", "gossipsub", "mdns", "macros", "ping", "identify", "kad", "noise", "tcp", "yamux"] }
 tokio = { version = "1.36", features = ["full"] }
 futures = "0.3"
 sysinfo = { version = "0.30", default-features = false }

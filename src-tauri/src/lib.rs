@@ -5,7 +5,6 @@ use p2p::{P2PNode, P2PEvent};
 use system::{SystemMonitor, SystemInfo};
 use std::sync::Mutex;
 use tokio::sync::mpsc;
-use std::sync::Arc;
 
 pub struct AppState {
     p2p_node: Mutex<Option<P2PNode>>,
