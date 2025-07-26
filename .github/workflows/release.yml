@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install Rust (Ubuntu/macOS)
@@ -42,10 +42,7 @@ jobs:
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          # Update Node.js to latest LTS
-          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
           sudo apt-get update
-          sudo apt-get install -y software-properties-common
           sudo apt-get install -y \
             libwebkitgtk-6.0-dev \
             build-essential \
@@ -72,9 +69,7 @@ jobs:
             libxcomposite-dev \
             libxdamage-dev \
             libxfixes-dev \
-            libxrandr-dev \
             libgbm-dev \
-            libxss-dev \
             libatk-bridge2.0-dev \
             libatspi2.0-dev \
             libgdk-pixbuf2.0-dev \
@@ -84,11 +79,6 @@ jobs:
             libgirepository1.0-dev \
             libgstreamer1.0-dev \
             libgstreamer-plugins-base1.0-dev
-          sudo apt-get clean
-          sudo apt-get autoremove -y
-          # Set proper permissions
-          sudo chmod -R 755 /usr/lib/x86_64-linux-gnu/
-          sudo chmod -R 755 /usr/include/
 
       - name: Install dependencies (macOS)
         if: matrix.platform == 'macos-latest'
@@ -116,8 +106,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig
           LD_LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
-          WEBKIT_DISABLE_COMPOSITING_MODE: 1
-          WEBKIT_DISABLE_GPU_PROCESS: 1
 
       - name: Upload artifacts (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
