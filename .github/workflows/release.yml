@@ -42,6 +42,8 @@ jobs:
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
         run: |
+          # Update Node.js to latest LTS
+          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
           sudo apt-get update
           sudo apt-get install -y software-properties-common
           sudo apt-get install -y \
@@ -80,9 +82,16 @@ jobs:
             libpango1.0-dev \
             libgirepository1.0-dev \
             libgstreamer1.0-dev \
-            libgstreamer-plugins-base1.0-dev
+            libgstreamer-plugins-base1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            libwebkit2gtk-4.0-37 \
+            libwebkit2gtk-4.0-37-gtk3 \
+            libwebkit2gtk-4.0-37-gtk4
           sudo apt-get clean
           sudo apt-get autoremove -y
+          # Set proper permissions
+          sudo chmod -R 755 /usr/lib/x86_64-linux-gnu/
+          sudo chmod -R 755 /usr/include/
 
       - name: Install dependencies (macOS)
         if: matrix.platform == 'macos-latest'
@@ -110,6 +119,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig
           LD_LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
+          WEBKIT_DISABLE_COMPOSITING_MODE: 1
+          WEBKIT_DISABLE_GPU_PROCESS: 1
 
       - name: Upload artifacts (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
