@@ -26,11 +26,18 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install Rust
+      - name: Install Rust (Ubuntu/macOS)
+        if: matrix.platform != 'windows-latest'
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
+
+      - name: Install Rust (Windows)
+        if: matrix.platform == 'windows-latest'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
 
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
@@ -43,7 +50,8 @@ jobs:
             libssl-dev \
             libgtk-3-dev \
             libayatana-appindicator3-dev \
-            librsvg2-dev
+            librsvg2-dev \
+            pkg-config
 
       - name: Install dependencies (macOS)
         if: matrix.platform == 'macos-latest'
@@ -66,10 +74,27 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artifacts
+      - name: Upload artifacts (Ubuntu)
+        if: matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ matrix.platform }}
+          name: release-ubuntu-latest
+          path: src-tauri/target/release/
+          if-no-files-found: error
+
+      - name: Upload artifacts (macOS)
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-macos-latest
+          path: src-tauri/target/release/
+          if-no-files-found: error
+
+      - name: Upload artifacts (Windows)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-windows-latest
           path: src-tauri/target/release/
           if-no-files-found: error
 

@@ -10,8 +10,9 @@ pub enum P2PEvent {
     PeerCount { count: usize },
 }
 
+#[derive(Clone)]
 pub struct P2PNode {
-    event_sender: mpsc::UnboundedSender<P2PEvent>,
+    pub event_sender: mpsc::UnboundedSender<P2PEvent>,
     is_running: bool,
 }
 

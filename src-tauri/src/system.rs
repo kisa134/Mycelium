@@ -1,4 +1,4 @@
-use sysinfo::{CpuExt, System, SystemExt};
+use sysinfo::System;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

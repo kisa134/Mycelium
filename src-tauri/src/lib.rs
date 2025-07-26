@@ -5,6 +5,7 @@ use p2p::{P2PNode, P2PEvent};
 use system::{SystemMonitor, SystemInfo};
 use std::sync::Mutex;
 use tokio::sync::mpsc;
+use tauri::{Emitter, Runtime};
 
 pub struct AppState {
     p2p_node: Mutex<Option<P2PNode>>,
@@ -23,11 +24,13 @@ impl Default for AppState {
 }
 
 #[tauri::command]
-async fn start_node(window: tauri::Window, state: tauri::State<'_, AppState>) -> Result<(), String> {
-    let mut p2p_guard = state.p2p_node.lock().map_err(|e| e.to_string())?;
-    
-    if p2p_guard.is_some() {
-        return Err("P2P node is already running".to_string());
+async fn start_node<R: Runtime>(window: tauri::Window<R>, state: tauri::State<'_, AppState>) -> Result<(), String> {
+    // Check if node is already running
+    {
+        let p2p_guard = state.p2p_node.lock().map_err(|e| e.to_string())?;
+        if p2p_guard.is_some() {
+            return Err("P2P node is already running".to_string());
+        }
     }
 
     let (mut p2p_node, mut event_receiver) = P2PNode::new()
@@ -39,7 +42,10 @@ async fn start_node(window: tauri::Window, state: tauri::State<'_, AppState>) ->
         .map_err(|e| format!("Failed to start P2P node: {}", e))?;
 
     let event_sender = p2p_node.event_sender.clone();
-    *state.event_sender.lock().map_err(|e| e.to_string())? = Some(event_sender);
+    {
+        let mut event_guard = state.event_sender.lock().map_err(|e| e.to_string())?;
+        *event_guard = Some(event_sender);
+    }
 
     // Start event loop in a separate task
     let window_clone = window.clone();
@@ -76,8 +82,9 @@ async fn start_node(window: tauri::Window, state: tauri::State<'_, AppState>) ->
 
     // Start the main event loop in a separate task
     let window_clone = window.clone();
+    let mut p2p_node_clone = p2p_node.clone();
     tokio::spawn(async move {
-        if let Err(e) = p2p_node.run_event_loop().await {
+        if let Err(e) = p2p_node_clone.run_event_loop().await {
             let _ = window_clone.emit("p2p_event", serde_json::json!({
                 "type": "ERROR",
                 "payload": { "error": e.to_string() }
@@ -85,24 +92,33 @@ async fn start_node(window: tauri::Window, state: tauri::State<'_, AppState>) ->
         }
     });
 
-    *p2p_guard = Some(p2p_node);
+    // Store the P2P node
+    {
+        let mut p2p_guard = state.p2p_node.lock().map_err(|e| e.to_string())?;
+        *p2p_guard = Some(p2p_node);
+    }
 
     Ok(())
 }
 
 #[tauri::command]
 async fn stop_node(state: tauri::State<'_, AppState>) -> Result<(), String> {
-    let mut p2p_guard = state.p2p_node.lock().map_err(|e| e.to_string())?;
-    
-    if p2p_guard.is_none() {
-        return Err("P2P node is not running".to_string());
-    }
+    {
+        let mut p2p_guard = state.p2p_node.lock().map_err(|e| e.to_string())?;
+        
+        if p2p_guard.is_none() {
+            return Err("P2P node is not running".to_string());
+        }
 
-    // Clear the event sender
-    *state.event_sender.lock().map_err(|e| e.to_string())? = None;
-    
-    // Drop the P2P node
-    *p2p_guard = None;
+        // Clear the event sender
+        {
+            let mut event_guard = state.event_sender.lock().map_err(|e| e.to_string())?;
+            *event_guard = None;
+        }
+        
+        // Drop the P2P node
+        *p2p_guard = None;
+    }
 
     Ok(())
 }
