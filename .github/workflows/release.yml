@@ -38,12 +38,13 @@ jobs:
         if: matrix.platform.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:webkit-team/ppa -y
+          sudo apt-get update
           sudo apt-get install -y \
             libwebkitgtk-6.0-dev \
             javascriptcoregtk-4.1 \
             webkit2gtk-4.1 \
-            libwebkit2gtk-4.0-dev \
-            libwebkit2gtk-4.1-dev \
             build-essential \
             curl \
             wget \
@@ -53,9 +54,8 @@ jobs:
             libayatana-appindicator3-dev \
             librsvg2-dev \
             pkg-config \
-            libwebkit2gtk-4.0-37 \
-            libwebkit2gtk-4.0-37-gtk3 \
-            libwebkit2gtk-4.0-37-gtk4
+            libwebkit2gtk-4.0-dev \
+            libwebkit2gtk-4.1-dev
 
       - name: Install dependencies (Windows)
         if: matrix.platform.os == 'windows-latest'
