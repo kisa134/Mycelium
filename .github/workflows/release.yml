@@ -82,6 +82,28 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+      - name: Find and upload release files
+        run: |
+          # Find the main executable file
+          if [[ "${{ matrix.platform.os }}" == "windows-latest" ]]; then
+            RELEASE_FILE=$(find src-tauri/target/release -name "*.exe" -type f | head -1)
+          elif [[ "${{ matrix.platform.os }}" == "macos-latest" ]]; then
+            RELEASE_FILE=$(find src-tauri/target/release -name "*.dmg" -type f | head -1)
+          else
+            RELEASE_FILE=$(find src-tauri/target/release -name "*.AppImage" -type f | head -1)
+            if [[ -z "$RELEASE_FILE" ]]; then
+              RELEASE_FILE=$(find src-tauri/target/release -name "*.deb" -type f | head -1)
+            fi
+          fi
+          
+          if [[ -n "$RELEASE_FILE" ]]; then
+            echo "RELEASE_FILE=$RELEASE_FILE" >> $GITHUB_ENV
+            echo "Found release file: $RELEASE_FILE"
+          else
+            echo "No release file found!"
+            exit 1
+          fi
+
   create-release:
     needs: build-release
     runs-on: ubuntu-latest
@@ -98,49 +120,73 @@ jobs:
           path: artifacts
 
       - name: Create Release
-        run: |
-          # Create release
-          gh release create ${{ github.ref_name }} \
-            --title "Release ${{ github.ref_name }}" \
-            --notes "Release ${{ github.ref_name }}" \
-            --draft=false \
-            --prerelease=false \
-            --generate-notes=true
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            Release ${{ github.ref_name }}
+            
+            ## What's Changed
+            - Bug fixes and improvements
+            - Updated dependencies
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Asset with Retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_on: error
+          command: |
+            gh release upload ${{ github.ref_name }} artifacts/release-windows-latest/*.exe \
+              --clobber \
+              --repo ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Assets with Retry
-        run: |
-          # Function to upload with retry
-          upload_with_retry() {
-            local file="$1"
-            local max_attempts=5
-            local attempt=1
-            
-            while [ $attempt -le $max_attempts ]; do
-              echo "Attempt $attempt of $max_attempts to upload $file"
-              
-              if gh release upload ${{ github.ref_name }} "$file" --clobber; then
-                echo "Successfully uploaded $file"
-                return 0
-              else
-                echo "Failed to upload $file (attempt $attempt)"
-                if [ $attempt -lt $max_attempts ]; then
-                  echo "Waiting 10 seconds before retry..."
-                  sleep 10
-                fi
-                attempt=$((attempt + 1))
-              fi
-            done
-            
-            echo "Failed to upload $file after $max_attempts attempts"
-            return 1
-          }
-          
-          # Upload all files with retry
-          find artifacts -type f -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" | while read file; do
-            upload_with_retry "$file"
-          done
+      - name: Upload macOS Asset with Retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_on: error
+          command: |
+            gh release upload ${{ github.ref_name }} artifacts/release-macos-latest/*.dmg \
+              --clobber \
+              --repo ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Linux Asset with Retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_on: error
+          command: |
+            gh release upload ${{ github.ref_name }} artifacts/release-ubuntu-latest/*.AppImage \
+              --clobber \
+              --repo ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload Linux DEB Asset with Retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_on: error
+          command: |
+            gh release upload ${{ github.ref_name }} artifacts/release-ubuntu-latest/*.deb \
+              --clobber \
+              --repo ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
