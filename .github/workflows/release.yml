@@ -80,6 +80,7 @@ jobs:
           name: release-${{ matrix.platform.os }}
           path: src-tauri/target/release/
           if-no-files-found: error
+          retention-days: 1
 
   create-release:
     needs: build-release
@@ -96,7 +97,7 @@ jobs:
         with:
           path: artifacts
 
-      - name: Create Release
+      - name: Create Release with Retry
         uses: softprops/action-gh-release@v1
         with:
           files: |
@@ -106,6 +107,9 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+          retry: true
+          retry_attempts: 5
+          retry_delay: 10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
