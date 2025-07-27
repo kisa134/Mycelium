@@ -47,8 +47,7 @@ jobs:
             libgtk-4-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
-            pkg-config \
-            libwebkitgtk-6.0-dev
+            pkg-config
 
       - name: Install dependencies (Windows)
         if: matrix.platform.os == 'windows-latest'
