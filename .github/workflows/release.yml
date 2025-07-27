@@ -139,39 +139,171 @@ jobs:
       - name: Upload Windows Asset with Retry
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 10
+          timeout_minutes: 15
           max_attempts: 5
           retry_on: error
           command: |
-            gh release upload ${{ github.ref_name }} artifacts/release-windows-latest/*.exe \
-              --clobber \
-              --repo ${{ github.repository }}
+            # Function to upload with rate limit handling
+            upload_with_rate_limit() {
+              local file="$1"
+              local max_attempts=5
+              local attempt=1
+              
+              while [ $attempt -le $max_attempts ]; do
+                echo "Attempt $attempt of $max_attempts to upload $file"
+                
+                # Capture both stdout and stderr
+                output=$(gh release upload ${{ github.ref_name }} "$file" --clobber --repo ${{ github.repository }} 2>&1)
+                exit_code=$?
+                
+                if [ $exit_code -eq 0 ]; then
+                  echo "Successfully uploaded $file"
+                  return 0
+                else
+                  echo "Upload failed with exit code $exit_code"
+                  echo "Output: $output"
+                  
+                  # Check for rate limit error
+                  if echo "$output" | grep -q "API rate limit exceeded\|HTTP 403"; then
+                    echo "GitHub API rate limit exceeded. Waiting 60 seconds before retry..."
+                    sleep 60
+                  else
+                    echo "Failed to upload $file (attempt $attempt)"
+                    if [ $attempt -lt $max_attempts ]; then
+                      echo "Waiting 10 seconds before retry..."
+                      sleep 10
+                    fi
+                  fi
+                  attempt=$((attempt + 1))
+                fi
+              done
+              
+              echo "Failed to upload $file after $max_attempts attempts"
+              return 1
+            }
+            
+            # Upload Windows executable
+            find artifacts/release-windows-latest -name "*.exe" -type f | while read file; do
+              upload_with_rate_limit "$file"
+            done
+            
+            # Wait between different asset types to avoid rate limit
+            echo "Waiting 30 seconds before next asset type..."
+            sleep 30
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload macOS Asset with Retry
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 10
+          timeout_minutes: 15
           max_attempts: 5
           retry_on: error
           command: |
-            gh release upload ${{ github.ref_name }} artifacts/release-macos-latest/*.dmg \
-              --clobber \
-              --repo ${{ github.repository }}
+            # Function to upload with rate limit handling
+            upload_with_rate_limit() {
+              local file="$1"
+              local max_attempts=5
+              local attempt=1
+              
+              while [ $attempt -le $max_attempts ]; do
+                echo "Attempt $attempt of $max_attempts to upload $file"
+                
+                # Capture both stdout and stderr
+                output=$(gh release upload ${{ github.ref_name }} "$file" --clobber --repo ${{ github.repository }} 2>&1)
+                exit_code=$?
+                
+                if [ $exit_code -eq 0 ]; then
+                  echo "Successfully uploaded $file"
+                  return 0
+                else
+                  echo "Upload failed with exit code $exit_code"
+                  echo "Output: $output"
+                  
+                  # Check for rate limit error
+                  if echo "$output" | grep -q "API rate limit exceeded\|HTTP 403"; then
+                    echo "GitHub API rate limit exceeded. Waiting 60 seconds before retry..."
+                    sleep 60
+                  else
+                    echo "Failed to upload $file (attempt $attempt)"
+                    if [ $attempt -lt $max_attempts ]; then
+                      echo "Waiting 10 seconds before retry..."
+                      sleep 10
+                    fi
+                  fi
+                  attempt=$((attempt + 1))
+                fi
+              done
+              
+              echo "Failed to upload $file after $max_attempts attempts"
+              return 1
+            }
+            
+            # Upload macOS DMG
+            find artifacts/release-macos-latest -name "*.dmg" -type f | while read file; do
+              upload_with_rate_limit "$file"
+            done
+            
+            # Wait between different asset types to avoid rate limit
+            echo "Waiting 30 seconds before next asset type..."
+            sleep 30
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Linux Asset with Retry
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 10
+          timeout_minutes: 15
           max_attempts: 5
           retry_on: error
           command: |
-            gh release upload ${{ github.ref_name }} artifacts/release-ubuntu-latest/*.AppImage \
-              --clobber \
-              --repo ${{ github.repository }}
+            # Function to upload with rate limit handling
+            upload_with_rate_limit() {
+              local file="$1"
+              local max_attempts=5
+              local attempt=1
+              
+              while [ $attempt -le $max_attempts ]; do
+                echo "Attempt $attempt of $max_attempts to upload $file"
+                
+                # Capture both stdout and stderr
+                output=$(gh release upload ${{ github.ref_name }} "$file" --clobber --repo ${{ github.repository }} 2>&1)
+                exit_code=$?
+                
+                if [ $exit_code -eq 0 ]; then
+                  echo "Successfully uploaded $file"
+                  return 0
+                else
+                  echo "Upload failed with exit code $exit_code"
+                  echo "Output: $output"
+                  
+                  # Check for rate limit error
+                  if echo "$output" | grep -q "API rate limit exceeded\|HTTP 403"; then
+                    echo "GitHub API rate limit exceeded. Waiting 60 seconds before retry..."
+                    sleep 60
+                  else
+                    echo "Failed to upload $file (attempt $attempt)"
+                    if [ $attempt -lt $max_attempts ]; then
+                      echo "Waiting 10 seconds before retry..."
+                      sleep 10
+                    fi
+                  fi
+                  attempt=$((attempt + 1))
+                fi
+              done
+              
+              echo "Failed to upload $file after $max_attempts attempts"
+              return 1
+            }
+            
+            # Upload Linux AppImage
+            find artifacts/release-ubuntu-latest -name "*.AppImage" -type f | while read file; do
+              upload_with_rate_limit "$file"
+            done
+            
+            # Wait between different asset types to avoid rate limit
+            echo "Waiting 30 seconds before next asset type..."
+            sleep 30
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
@@ -179,13 +311,53 @@ jobs:
       - name: Upload Linux DEB Asset with Retry
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 10
+          timeout_minutes: 15
           max_attempts: 5
           retry_on: error
           command: |
-            gh release upload ${{ github.ref_name }} artifacts/release-ubuntu-latest/*.deb \
-              --clobber \
-              --repo ${{ github.repository }}
+            # Function to upload with rate limit handling
+            upload_with_rate_limit() {
+              local file="$1"
+              local max_attempts=5
+              local attempt=1
+              
+              while [ $attempt -le $max_attempts ]; do
+                echo "Attempt $attempt of $max_attempts to upload $file"
+                
+                # Capture both stdout and stderr
+                output=$(gh release upload ${{ github.ref_name }} "$file" --clobber --repo ${{ github.repository }} 2>&1)
+                exit_code=$?
+                
+                if [ $exit_code -eq 0 ]; then
+                  echo "Successfully uploaded $file"
+                  return 0
+                else
+                  echo "Upload failed with exit code $exit_code"
+                  echo "Output: $output"
+                  
+                  # Check for rate limit error
+                  if echo "$output" | grep -q "API rate limit exceeded\|HTTP 403"; then
+                    echo "GitHub API rate limit exceeded. Waiting 60 seconds before retry..."
+                    sleep 60
+                  else
+                    echo "Failed to upload $file (attempt $attempt)"
+                    if [ $attempt -lt $max_attempts ]; then
+                      echo "Waiting 10 seconds before retry..."
+                      sleep 10
+                    fi
+                  fi
+                  attempt=$((attempt + 1))
+                fi
+              done
+              
+              echo "Failed to upload $file after $max_attempts attempts"
+              return 1
+            }
+            
+            # Upload Linux DEB
+            find artifacts/release-ubuntu-latest -name "*.deb" -type f | while read file; do
+              upload_with_rate_limit "$file"
+            done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
