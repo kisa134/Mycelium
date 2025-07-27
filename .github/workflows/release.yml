@@ -48,7 +48,9 @@ jobs:
             libayatana-appindicator3-dev \
             librsvg2-dev \
             pkg-config \
-            libjavascriptcoregtk-4.1-dev
+            libjavascriptcoregtk-4.1-dev \
+            libglib2.0-dev \
+            libsoup-3.0-dev
 
       - name: Set PKG_CONFIG_PATH (Ubuntu)
         if: matrix.platform.os == 'ubuntu-latest'
