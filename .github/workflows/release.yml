@@ -47,7 +47,8 @@ jobs:
             libgtk-4-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
-            pkg-config
+            pkg-config \
+            javascriptcoregtk-4.1
 
       - name: Install dependencies (Windows)
         if: matrix.platform.os == 'windows-latest'
