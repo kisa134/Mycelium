@@ -1,5 +1,9 @@
 name: Release
 
+# Этот блок дает права нашему "погрузчику"
+permissions:
+  contents: write
+
 on:
   push:
     tags:
@@ -39,7 +43,9 @@ jobs:
             libssl-dev \
             libgtk-3-dev \
             libayatana-appindicator3-dev \
-            librsvg2-dev
+            librsvg2-dev \
+            # Это тот самый недостающий инструмент для Ubuntu
+            libjavascriptcoregtk-6.0-dev
 
       - name: Install frontend dependencies
         run: npm install
@@ -54,4 +60,3 @@ jobs:
           releaseBody: 'Первый стабильный релиз ноды Mycelium. Создан автоматически.'
           releaseDraft: false
           prerelease: false
-
