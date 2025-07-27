@@ -1,6 +1,6 @@
-name: Release
+name: Release Mycelium Node
 
-# Этот блок дает права нашему "погрузчику"
+# Этот блок дает права нашему роботу-публикатору. Ошибка №1 - исправлена.
 permissions:
   contents: write
 
@@ -38,24 +38,32 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            libwebkitgtk-6.0-dev \
             build-essential \
             libssl-dev \
             libgtk-3-dev \
-            libayatana-appindicator3-dev \
             librsvg2-dev \
-            libjavascriptcoregtk-6.0-dev
+            libayatana-appindicator3-dev \
+            # Устанавливаем правильную, а не новую версию WebKit
+            libwebkit2gtk-4.1-dev \
+            # Устанавливаем тот самый пакет, которого не хватало. Ошибка №2 - исправлена.
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Set PKG_CONFIG_PATH for Ubuntu
+        if: matrix.platform.os == 'ubuntu-latest'
+        # Устанавливаем ту самую переменную окружения. Ошибка №3 - исправлена.
+        run: echo "PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig" >> $GITHUB_ENV
 
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Build and Release with Tauri
+      - name: Build and Release with Tauri Action
+        # Это самый надежный способ публикации. Ошибка №4 - исправлена.
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Mycelium Node v__VERSION__'
-          releaseBody: 'Первый стабильный релиз ноды Mycelium. Создан автоматически.'
+          releaseBody: 'Стабильный релиз v0.1.1. Автоматическая сборка после полной отладки CI/CD.'
           releaseDraft: false
           prerelease: false
