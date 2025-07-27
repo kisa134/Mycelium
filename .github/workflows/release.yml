@@ -97,19 +97,50 @@ jobs:
         with:
           path: artifacts
 
-      - name: Create Release with Retry
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            artifacts/release-macos-latest/**/*
-            artifacts/release-ubuntu-latest/**/*
-            artifacts/release-windows-latest/**/*
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-          retry: true
-          retry_attempts: 5
-          retry_delay: 10
+      - name: Create Release
+        run: |
+          # Create release
+          gh release create ${{ github.ref_name }} \
+            --title "Release ${{ github.ref_name }}" \
+            --notes "Release ${{ github.ref_name }}" \
+            --draft=false \
+            --prerelease=false \
+            --generate-notes=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Assets with Retry
+        run: |
+          # Function to upload with retry
+          upload_with_retry() {
+            local file="$1"
+            local max_attempts=5
+            local attempt=1
+            
+            while [ $attempt -le $max_attempts ]; do
+              echo "Attempt $attempt of $max_attempts to upload $file"
+              
+              if gh release upload ${{ github.ref_name }} "$file" --clobber; then
+                echo "Successfully uploaded $file"
+                return 0
+              else
+                echo "Failed to upload $file (attempt $attempt)"
+                if [ $attempt -lt $max_attempts ]; then
+                  echo "Waiting 10 seconds before retry..."
+                  sleep 10
+                fi
+                attempt=$((attempt + 1))
+              fi
+            done
+            
+            echo "Failed to upload $file after $max_attempts attempts"
+            return 1
+          }
+          
+          # Upload all files with retry
+          find artifacts -type f -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" | while read file; do
+            upload_with_retry "$file"
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
