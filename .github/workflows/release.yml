@@ -83,6 +83,7 @@ jobs:
           retention-days: 1
 
       - name: Find and upload release files
+        shell: bash
         run: |
           # Find the main executable file
           if [[ "${{ matrix.platform.os }}" == "windows-latest" ]]; then
@@ -142,6 +143,7 @@ jobs:
           timeout_minutes: 15
           max_attempts: 5
           retry_on: error
+          shell: bash
           command: |
             # Function to upload with rate limit handling
             upload_with_rate_limit() {
@@ -199,6 +201,7 @@ jobs:
           timeout_minutes: 15
           max_attempts: 5
           retry_on: error
+          shell: bash
           command: |
             # Function to upload with rate limit handling
             upload_with_rate_limit() {
@@ -256,6 +259,7 @@ jobs:
           timeout_minutes: 15
           max_attempts: 5
           retry_on: error
+          shell: bash
           command: |
             # Function to upload with rate limit handling
             upload_with_rate_limit() {
@@ -314,6 +318,7 @@ jobs:
           timeout_minutes: 15
           max_attempts: 5
           retry_on: error
+          shell: bash
           command: |
             # Function to upload with rate limit handling
             upload_with_rate_limit() {
