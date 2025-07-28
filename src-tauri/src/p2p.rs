@@ -1,6 +1,55 @@
+use libp2p::{
+    identity,
+    mdns::{self, tokio::Behaviour},
+    swarm::{Swarm, SwarmEvent},
+    PeerId,
+};
+use std::error::Error;
+use tokio::time::{self, Duration};
 use tokio::sync::mpsc;
-use std::time::Duration;
-use tokio::time::sleep;
+use serde::{Serialize, Deserialize};
+
+// Наше поведение сети: пока что только mDNS для локального обнаружения.
+#[derive(libp2p::swarm::NetworkBehaviour)]
+#[behaviour(to_swarm = "MyEvent")]
+struct MyBehaviour {
+    mdns: Behaviour,
+}
+
+// События, которые будет генерировать наше поведение
+#[derive(Debug)]
+enum MyEvent {
+    Mdns(mdns::Event),
+}
+
+impl From<mdns::Event> for MyEvent {
+    fn from(event: mdns::Event) -> Self {
+        MyEvent::Mdns(event)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum PeerStatus {
+    Discovered,
+    Connected,
+    Disconnected,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Peer {
+    pub id: String,
+    pub status: PeerStatus,
+    pub last_seen: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NetworkStatus {
+    pub total_peers: usize,
+    pub connected_peers: usize,
+    pub discovered_peers: usize,
+    pub peers: Vec<Peer>,
+    pub local_peer_id: String,
+}
 
 #[derive(Debug, Clone)]
 pub enum P2PEvent {
@@ -8,65 +57,142 @@ pub enum P2PEvent {
     PeerDisconnected { peer_id: String },
     StatusUpdate { status_text: String },
     PeerCount { count: usize },
+    NetworkStatusUpdate { status: NetworkStatus },
 }
 
-#[derive(Clone)]
-pub struct P2PNode {
+pub struct RealP2PNode {
+    swarm: Swarm<MyBehaviour>,
     pub event_sender: mpsc::UnboundedSender<P2PEvent>,
     is_running: bool,
+    peers: Vec<Peer>,
+    local_peer_id: String,
 }
 
-impl P2PNode {
-    pub async fn new() -> Result<(Self, mpsc::UnboundedReceiver<P2PEvent>), Box<dyn std::error::Error>> {
+impl RealP2PNode {
+    pub async fn new() -> Result<(Self, mpsc::UnboundedReceiver<P2PEvent>), Box<dyn Error>> {
+        // Создаем уникальную криптографическую личность для нашей ноды
+        let local_key = identity::Keypair::generate_ed25519();
+        let local_peer_id = PeerId::from(local_key.public());
+        println!("Local peer id: {}", local_peer_id);
+
+        // Создаем транспортный уровень (TCP)
+        let transport = libp2p::tokio_development_transport(local_key)?;
+
+        // Создаем наше сетевое поведение
+        let behaviour = MyBehaviour {
+            mdns: mdns::tokio::Behaviour::new(mdns::Config::default(), local_peer_id)?,
+        };
+
+        // Создаем Swarm - это и есть наша нода
+        let mut swarm = Swarm::new(transport, behaviour, local_peer_id);
+
+        // Указываем Swarm слушать входящие соединения
+        swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+
         let (event_sender, event_receiver) = mpsc::unbounded_channel();
-        
-        Ok((P2PNode { 
-            event_sender, 
-            is_running: false 
+
+        Ok((RealP2PNode {
+            swarm,
+            event_sender,
+            is_running: false,
+            peers: Vec::new(),
+            local_peer_id: local_peer_id.to_string(),
         }, event_receiver))
     }
 
-    pub async fn start(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         self.is_running = true;
         
-        log::info!("P2P node started (simulated)");
+        log::info!("P2P node started. Local ID: {}", self.local_peer_id);
         self.event_sender.send(P2PEvent::StatusUpdate {
-            status_text: "P2P node started (simulated)".to_string(),
+            status_text: format!("Сеть запущена. Ваш ID: {}", self.local_peer_id),
         })?;
+
+        // Send initial network status
+        self.send_network_status_update().await?;
 
         Ok(())
     }
 
-    pub async fn run_event_loop(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        let mut peer_count = 0;
+    async fn send_network_status_update(&mut self) -> Result<(), Box<dyn Error>> {
+        let connected_count = self.peers.iter().filter(|p| matches!(p.status, PeerStatus::Connected)).count();
+        let discovered_count = self.peers.iter().filter(|p| matches!(p.status, PeerStatus::Discovered)).count();
         
+        let status = NetworkStatus {
+            total_peers: self.peers.len(),
+            connected_peers: connected_count,
+            discovered_peers: discovered_count,
+            peers: self.peers.clone(),
+            local_peer_id: self.local_peer_id.clone(),
+        };
+
+        self.event_sender.send(P2PEvent::NetworkStatusUpdate { status })?;
+        Ok(())
+    }
+
+    async fn add_or_update_peer(&mut self, peer_id: String, status: PeerStatus) -> Result<(), Box<dyn Error>> {
+        let now = chrono::Utc::now().format("%H:%M:%S").to_string();
+        
+        if let Some(peer) = self.peers.iter_mut().find(|p| p.id == peer_id) {
+            peer.status = status;
+            peer.last_seen = now;
+        } else {
+            self.peers.push(Peer {
+                id: peer_id,
+                status,
+                last_seen: now,
+            });
+        }
+
+        self.send_network_status_update().await?;
+        Ok(())
+    }
+
+    pub async fn run_event_loop(&mut self) -> Result<(), Box<dyn Error>> {
         while self.is_running {
-            // Simulate peer discovery
-            if peer_count < 5 {
-                sleep(Duration::from_secs(2)).await;
-                peer_count += 1;
-                
-                let peer_id = format!("12D3KooW{}", peer_count);
-                self.event_sender.send(P2PEvent::PeerConnected {
-                    peer_id: peer_id.clone(),
-                })?;
-                
-                self.event_sender.send(P2PEvent::StatusUpdate {
-                    status_text: format!("Discovered peer: {}", peer_id),
-                })?;
-                
-                self.event_sender.send(P2PEvent::PeerCount {
-                    count: peer_count,
-                })?;
+            // Опрашиваем Swarm на предмет новых событий
+            match self.swarm.select_next_some().await {
+                SwarmEvent::Behaviour(MyEvent::Mdns(mdns::Event::Discovered(list))) => {
+                    for (peer_id, _multiaddr) in list {
+                        println!("mDNS discovered a new peer: {}", peer_id);
+                        
+                        // Добавляем пира в наш список
+                        self.add_or_update_peer(peer_id.to_string(), PeerStatus::Discovered).await?;
+                        
+                        self.event_sender.send(P2PEvent::StatusUpdate {
+                            status_text: format!("Обнаружен новый участник: {}", peer_id),
+                        })?;
+                    }
+                }
+                SwarmEvent::Behaviour(MyEvent::Mdns(mdns::Event::Expired(list))) => {
+                    for (peer_id, _multiaddr) in list {
+                        println!("mDNS discover peer has expired: {}", peer_id);
+                        
+                        // Помечаем пира как отключенного
+                        self.add_or_update_peer(peer_id.to_string(), PeerStatus::Disconnected).await?;
+                        
+                        self.event_sender.send(P2PEvent::StatusUpdate {
+                            status_text: format!("Участник {} покинул сеть.", peer_id),
+                        })?;
+                    }
+                }
+                SwarmEvent::NewListenAddr { address, .. } => {
+                    println!("Local node is listening on {}", address);
+                    self.event_sender.send(P2PEvent::StatusUpdate {
+                        status_text: format!("Нода слушает на адресе: {}", address),
+                    })?;
+                }
+                _ => {}
             }
-            
-            sleep(Duration::from_secs(5)).await;
         }
 
         Ok(())
     }
 
     pub fn get_peer_count(&self) -> usize {
-        0
+        self.peers.iter().filter(|p| matches!(p.status, PeerStatus::Connected)).count()
     }
-} 
+}
+
+// Для обратной совместимости
+pub type P2PNode = RealP2PNode; 

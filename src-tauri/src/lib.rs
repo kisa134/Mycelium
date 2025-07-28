@@ -1,14 +1,14 @@
 mod p2p;
 mod system;
 
-use p2p::{P2PNode, P2PEvent};
+use p2p::{RealP2PNode, P2PEvent};
 use system::{SystemMonitor, SystemInfo};
 use std::sync::Mutex;
 use tokio::sync::mpsc;
 use tauri::{Emitter, Runtime};
 
 pub struct AppState {
-    p2p_node: Mutex<Option<P2PNode>>,
+    p2p_node: Mutex<Option<RealP2PNode>>,
     system_monitor: Mutex<SystemMonitor>,
     event_sender: Mutex<Option<mpsc::UnboundedSender<P2PEvent>>>,
 }
@@ -33,7 +33,7 @@ async fn start_node<R: Runtime>(window: tauri::Window<R>, state: tauri::State<'_
         }
     }
 
-    let (mut p2p_node, mut event_receiver) = P2PNode::new()
+    let (mut p2p_node, mut event_receiver) = RealP2PNode::new()
         .await
         .map_err(|e| format!("Failed to create P2P node: {}", e))?;
 
@@ -52,30 +52,16 @@ async fn start_node<R: Runtime>(window: tauri::Window<R>, state: tauri::State<'_
     tokio::spawn(async move {
         while let Some(event) = event_receiver.recv().await {
             match event {
-                P2PEvent::PeerConnected { peer_id } => {
-                    let _ = window_clone.emit("p2p_event", serde_json::json!({
-                        "type": "PEER_CONNECTED",
-                        "payload": { "peer_id": peer_id }
-                    }));
-                }
-                P2PEvent::PeerDisconnected { peer_id } => {
-                    let _ = window_clone.emit("p2p_event", serde_json::json!({
-                        "type": "PEER_DISCONNECTED",
-                        "payload": { "peer_id": peer_id }
-                    }));
-                }
                 P2PEvent::StatusUpdate { status_text } => {
                     let _ = window_clone.emit("p2p_event", serde_json::json!({
                         "type": "STATUS_UPDATE",
                         "payload": { "status_text": status_text }
                     }));
                 }
-                P2PEvent::PeerCount { count } => {
-                    let _ = window_clone.emit("p2p_event", serde_json::json!({
-                        "type": "PEER_COUNT",
-                        "payload": { "count": count }
-                    }));
+                P2PEvent::NetworkStatusUpdate { status } => {
+                    let _ = window_clone.emit("network-status-update", serde_json::to_value(status).unwrap());
                 }
+                _ => {}
             }
         }
     });
