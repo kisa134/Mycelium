@@ -652,33 +652,4 @@ async fn generate_default_dashboard_data() -> DashboardData {
     }
 }
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
-        .manage(AppState::default())
-        .invoke_handler(tauri::generate_handler![
-            start_node,
-            stop_node,
-            get_system_info,
-            get_dashboard_data,
-            update_dashboard_data,
-            get_active_tasks,
-            get_task_details,
-            pause_task,
-            resume_task,
-            cancel_task,
-            get_storage_summary,
-            get_active_fragments,
-            get_conversations,
-            send_message,
-            get_permission_profiles,
-            update_permission_settings,
-            get_analytics_data
-        ])
-        .run(tauri::generate_context!())
-        .unwrap_or_else(|e| {
-            log::error!("Failed to run Tauri application: {}", e);
-            std::process::exit(1);
-        });
-}
+// Removed run() function - moved to main.rs
