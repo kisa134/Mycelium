@@ -1,128 +1,181 @@
-# Mycelium Node v0.1.0
+# 🍄 **MYCELIUM - ПРОТОКОЛ "СИМБИОЗ"**
 
-Welcome to Mycelium — a decentralized computing network that unites idle resources from home computers to solve global tasks and create an environment for the next generation of AI.
+> **Инновационная P2P платформа для взаимодействия между человеком и AI**
 
-## Our Mission
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/mycelium/protocol-symbiosis/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/mycelium/protocol-symbiosis/releases)
 
-We believe that 99% of the world's computing power is idle. Instead of building energy-intensive data centers, we create a network where everyone can contribute. This is not just resource conservation, it's a step towards an open, transparent, and collective future of artificial intelligence.
+---
 
-## Features
+## 🚀 **БЫСТРЫЙ СТАРТ**
 
-- **P2P Network**: Built on libp2p with Kademlia DHT, Identify, Ping, and mDNS protocols
-- **Real-time Monitoring**: CPU and RAM usage monitoring with live updates
-- **Cross-platform**: Native desktop applications for Windows, macOS, and Linux
-- **Modern UI**: Clean, responsive interface built with SvelteKit and TailwindCSS
-- **Automatic Discovery**: Automatic peer discovery and connection management
+### **Скачать и установить**
+1. Перейдите в [Releases](https://github.com/mycelium/protocol-symbiosis/releases)
+2. Скачайте `mycelium-v1.0.0-windows-x64.zip`
+3. Распакуйте и запустите `mycelium.exe`
 
-## Technology Stack
+### **Требования**
+- **OS**: Windows 10/11 (64-bit)
+- **RAM**: 4 GB минимум, 8 GB рекомендуется
+- **Storage**: 500 MB свободного места
+- **Network**: Интернет соединение
 
-- **Backend**: Rust + libp2p + Tauri
-- **Frontend**: SvelteKit + TypeScript + TailwindCSS
-- **P2P Protocols**: Kademlia DHT, Identify, Ping, GossipSub, mDNS
-- **Build System**: GitHub Actions with automated releases
+---
 
-## Installation
+## 🎯 **О ПРОЕКТЕ**
 
-Download the latest version for your operating system from the [Releases](https://github.com/kisa134/Mycelium/releases) section.
+Mycelium - это децентрализованная платформа, основанная на протоколе "Симбиоз", которая создает экосистему взаимодействия между человеком и искусственным интеллектом через P2P сеть.
 
-### Prerequisites
+### **Ключевые особенности**
+- 🔗 **P2P Архитектура**: Прямое взаимодействие без центральных серверов
+- 🤖 **AI Интеграция**: Поддержка различных AI моделей и алгоритмов
+- 🔐 **Безопасность**: Шифрование и гранулярные разрешения
+- 📊 **Аналитика**: Детальная статистика и метрики
+- 🎨 **Современный UI**: Интуитивный интерфейс на Svelte + Tauri
 
-- Windows 10/11, macOS 10.15+, or Linux (Ubuntu 18.04+)
-- 4GB RAM minimum
-- 100MB free disk space
+---
 
-## Development
+## 🏗️ **АРХИТЕКТУРА**
 
-### Prerequisites
+### **Протоколы "Симбиоза"**
 
-- [Rust](https://rustup.rs/) (latest stable)
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [Tauri CLI](https://tauri.app/v1/guides/getting-started/setup/)
+#### **🧠 Synapse - AI Задачи**
+- Управление AI задачами и ресурсами
+- Мониторинг CPU, RAM, GPU
+- Система токенов и вознаграждений
+- Распределенные вычисления
 
-### Setup
+#### **📚 Chronicle - Хранение**
+- Безопасное хранение данных
+- Фрагментация и шифрование
+- Резервное копирование
+- Контроль доступа
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/kisa134/Mycelium.git
-   cd Mycelium
-   ```
+#### **💬 Contact - Общение**
+- Прямое общение с AIbox
+- Система сообщений и уведомлений
+- История диалогов
+- Настройки приватности
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+#### **🔐 Covenant - Разрешения**
+- Гранулярные разрешения
+- Профили безопасности
+- Аудит действий
+- Контроль ресурсов
 
-3. Run in development mode:
-   ```bash
-   npm run tauri dev
-   ```
+#### **📈 Analytics - Аналитика**
+- Метрики производительности
+- Статистика сети
+- Визуализация данных
+- Отчеты и тренды
 
-### Building
+---
 
-To build the application:
+## 🛠️ **ТЕХНОЛОГИИ**
 
+### **Frontend**
+- **Svelte**: Современный фреймворк
+- **Tailwind CSS**: Утилитарные стили
+- **Vite**: Быстрая сборка
+- **TypeScript**: Типизация
+
+### **Backend**
+- **Rust**: Высокая производительность
+- **Tauri**: Нативные приложения
+- **Tokio**: Асинхронность
+- **Serde**: Сериализация
+
+### **Сеть**
+- **P2P**: Децентрализованная архитектура
+- **WebRTC**: Прямые соединения
+- **libp2p**: Сетевая библиотека
+- **Noise**: Шифрование
+
+---
+
+## 📖 **ДОКУМЕНТАЦИЯ**
+
+- **[Руководство пользователя](USER_GUIDE.md)** - Как использовать Mycelium
+- **[Заметки о релизе](RELEASE_NOTES.md)** - Что нового в v1.0.0
+- **[Техническая документация](docs/)** - API и архитектура
+- **[Протоколы](SYMBIOSIS_PROTOCOL_FINAL_OVERVIEW.md)** - Детали протоколов
+
+---
+
+## 🚀 **РАЗРАБОТКА**
+
+### **Установка зависимостей**
 ```bash
-npm run tauri build
+# Клонировать репозиторий
+git clone https://github.com/mycelium/protocol-symbiosis.git
+cd protocol-symbiosis
+
+# Установить Node.js зависимости
+npm install
+
+# Установить Rust (если не установлен)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-This will create platform-specific installers in `src-tauri/target/release/`.
+### **Запуск в режиме разработки**
+```bash
+# Запустить frontend
+npm run dev
 
-## Architecture
+# В другом терминале - запустить backend
+cd src-tauri
+cargo tauri dev
+```
 
-### P2P Network
+### **Сборка**
+```bash
+# Сборка для продакшена
+npm run build
+cd src-tauri
+cargo tauri build
+```
 
-The application implements a peer-to-peer network using libp2p with the following components:
+---
 
-- **Kademlia DHT**: Distributed hash table for peer discovery
-- **Identify Protocol**: Exchange of peer metadata
-- **Ping Protocol**: Peer health monitoring
-- **mDNS**: Local network peer discovery
-- **GossipSub**: Future task distribution (configured but not yet implemented)
+## 🧪 **ТЕСТИРОВАНИЕ**
 
-### System Monitoring
+Проект включает комплексные тестовые сценарии:
 
-Real-time monitoring of system resources:
+- **UI/UX тесты**: Проверка интерфейса
+- **Интеграционные тесты**: API и протоколы
+- **Производительность**: Нагрузочное тестирование
+- **Безопасность**: Аудит безопасности
 
-- CPU usage percentage
-- RAM usage with total/used memory display
-- Automatic updates every 2 seconds
+См. [TESTING_SCENARIOS.md](TESTING_SCENARIOS.md) для подробностей.
 
-### User Interface
+---
 
-Modern, responsive interface with:
+## 🤝 **СООБЩЕСТВО**
 
-- Connection status indicator
-- Peer count display
-- Resource usage graphs
-- Real-time event logs
-- Start/Stop controls
+### **Связаться с нами**
+- **GitHub Issues**: [Сообщить о проблеме](https://github.com/mycelium/protocol-symbiosis/issues)
+- **Discord**: [Присоединиться к сообществу](https://discord.gg/mycelium)
+- **Email**: support@mycelium.ai
+- **Telegram**: @mycelium_support
 
-## Contributing
+### **Вклад в проект**
+Мы приветствуем вклад в развитие проекта! См. [CONTRIBUTING.md](CONTRIBUTING.md) для руководства.
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+---
 
-## License
+## 📄 **ЛИЦЕНЗИЯ**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Проект распространяется под лицензией MIT. См. файл [LICENSE](LICENSE) для подробностей.
 
-## Roadmap
+---
 
-- [ ] Task distribution and execution
-- [ ] Blockchain integration for rewards
-- [ ] Advanced peer discovery algorithms
-- [ ] Mobile applications
-- [ ] Web dashboard
+## 🙏 **БЛАГОДАРНОСТИ**
 
-## Support
+Спасибо всем участникам сообщества за тестирование, обратную связь и поддержку проекта!
 
-If you encounter any issues or have questions, please:
+---
 
-1. Check the [Issues](https://github.com/kisa134/Mycelium/issues) page
-2. Create a new issue with detailed information
-3. Join our community discussions
-
-## Acknowledgments
-
-- [libp2p](https://libp2p.io/) for the P2P networking stack
-- [Tauri](https://tauri.app/) for the desktop application framework
-- [SvelteKit](https://kit.svelte.dev/) for the frontend framework
+**Версия**: 1.0.0  
+**Статус**: Стабильный релиз ✅  
+**Дата**: $(Get-Date)
