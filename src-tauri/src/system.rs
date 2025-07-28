@@ -1,6 +1,7 @@
 use sysinfo::System;
 use serde::{Deserialize, Serialize};
 
+/// Represents current system information including CPU and memory usage
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SystemInfo {
     pub cpu_usage: f32,
@@ -9,11 +10,17 @@ pub struct SystemInfo {
     pub ram_usage_percent: f32,
 }
 
+/// System monitor that tracks CPU and memory usage
 pub struct SystemMonitor {
     system: System,
 }
 
 impl SystemMonitor {
+    /// Creates a new system monitor and initializes system information
+    /// 
+    /// # Returns
+    /// 
+    /// A new SystemMonitor instance with refreshed system data
     pub fn new() -> Self {
         let mut system = System::new_all();
         system.refresh_all();
@@ -21,6 +28,13 @@ impl SystemMonitor {
         Self { system }
     }
 
+    /// Gets current system information including CPU and RAM usage
+    /// 
+    /// This function refreshes all system data and returns current metrics.
+    /// 
+    /// # Returns
+    /// 
+    /// SystemInfo containing current CPU usage, total RAM, used RAM, and RAM usage percentage
     pub fn get_system_info(&mut self) -> SystemInfo {
         self.system.refresh_all();
         

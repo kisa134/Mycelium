@@ -7,6 +7,7 @@ use std::sync::Mutex;
 use tokio::sync::mpsc;
 use tauri::{Emitter, Runtime};
 
+/// Application state containing P2P node and system monitoring
 pub struct AppState {
     p2p_node: Mutex<Option<RealP2PNode>>,
     system_monitor: Mutex<SystemMonitor>,
@@ -23,6 +24,16 @@ impl Default for AppState {
     }
 }
 
+/// Starts the P2P node and begins network operations
+/// 
+/// # Arguments
+/// 
+/// * `window` - Tauri window for emitting events to frontend
+/// * `state` - Application state containing P2P node
+/// 
+/// # Returns
+/// 
+/// Returns Ok(()) on success, or an error message on failure
 #[tauri::command]
 async fn start_node<R: Runtime>(window: tauri::Window<R>, state: tauri::State<'_, AppState>) -> Result<(), String> {
     // Check if node is already running
@@ -59,7 +70,19 @@ async fn start_node<R: Runtime>(window: tauri::Window<R>, state: tauri::State<'_
                     }));
                 }
                 P2PEvent::NetworkStatusUpdate { status } => {
-                    let _ = window_clone.emit("network-status-update", serde_json::to_value(status).unwrap());
+                    // Safely serialize status to JSON with error handling
+                    match serde_json::to_value(status) {
+                        Ok(json_value) => {
+                            let _ = window_clone.emit("network-status-update", json_value);
+                        }
+                        Err(e) => {
+                            log::error!("Failed to serialize network status: {}", e);
+                            let _ = window_clone.emit("p2p_event", serde_json::json!({
+                                "type": "ERROR",
+                                "payload": { "error": format!("Failed to serialize network status: {}", e) }
+                            }));
+                        }
+                    }
                 }
                 _ => {}
             }
@@ -87,6 +110,15 @@ async fn start_node<R: Runtime>(window: tauri::Window<R>, state: tauri::State<'_
     Ok(())
 }
 
+/// Stops the P2P node and cleans up resources
+/// 
+/// # Arguments
+/// 
+/// * `state` - Application state containing P2P node
+/// 
+/// # Returns
+/// 
+/// Returns Ok(()) on success, or an error message on failure
 #[tauri::command]
 async fn stop_node(state: tauri::State<'_, AppState>) -> Result<(), String> {
     {
@@ -109,6 +141,15 @@ async fn stop_node(state: tauri::State<'_, AppState>) -> Result<(), String> {
     Ok(())
 }
 
+/// Gets current system information including CPU and RAM usage
+/// 
+/// # Arguments
+/// 
+/// * `state` - Application state containing system monitor
+/// 
+/// # Returns
+/// 
+/// Returns SystemInfo on success, or an error message on failure
 #[tauri::command]
 fn get_system_info(state: tauri::State<'_, AppState>) -> Result<SystemInfo, String> {
     let mut monitor = state.system_monitor.lock().map_err(|e| e.to_string())?;
