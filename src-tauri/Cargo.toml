@@ -14,6 +14,10 @@ edition = "2021"
 name = "mycelium_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[[example]]
+name = "p2p_demo"
+path = "examples/p2p_demo.rs"
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 

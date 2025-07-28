@@ -195,4 +195,27 @@ impl RealP2PNode {
 }
 
 // Для обратной совместимости
-pub type P2PNode = RealP2PNode; 
+pub type P2PNode = RealP2PNode;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_p2p_node_creation() {
+        let result = RealP2PNode::new().await;
+        assert!(result.is_ok(), "Failed to create P2P node: {:?}", result.err());
+        
+        let (node, _receiver) = result.unwrap();
+        assert!(!node.local_peer_id.is_empty(), "Local peer ID should not be empty");
+        println!("Test passed: Created P2P node with ID: {}", node.local_peer_id);
+    }
+
+    #[tokio::test]
+    async fn test_p2p_node_start() {
+        let (mut node, _receiver) = RealP2PNode::new().await.unwrap();
+        let result = node.start().await;
+        assert!(result.is_ok(), "Failed to start P2P node: {:?}", result.err());
+        println!("Test passed: P2P node started successfully");
+    }
+} 
