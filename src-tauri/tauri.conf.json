@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "identifier": "com.mycelium-app.app",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "echo 'No build command needed'",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../build"
+    "beforeBuildCommand": "echo 'No build command needed'",
+    "frontendDist": "../"
   },
   "app": {
     "windows": [
