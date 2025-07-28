@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create GitHub Release</title>
+    <title>Fix Mycelium Release</title>
     <meta charset="UTF-8">
 </head>
 <body>
-    <h1>🚀 Create Mycelium v1.0.0 Release</h1>
+    <h1>🚨 ИСПРАВЛЕНИЕ РЕЛИЗА MYCELIUM</h1>
     
-    <h2>Step 1: Go to GitHub Releases</h2>
-    <p><a href="https://github.com/kisa134/Mycelium/releases" target="_blank">Click here to open GitHub Releases</a></p>
+    <h2>❌ ПРОБЛЕМА:</h2>
+    <p>Пользователь скачал веб-версию вместо исполняемого файла!</p>
     
-    <h2>Step 2: Create New Release</h2>
+    <h2>✅ РЕШЕНИЕ:</h2>
+    <p>Нужно загрузить ПРАВИЛЬНЫЙ файл: <strong>mycelium-app.exe</strong> (9.1 MB)</p>
+    
+    <button onclick="fixRelease()">ИСПРАВИТЬ РЕЛИЗ СЕЙЧАС</button>
+    
+    <h2>📋 ИНСТРУКЦИИ:</h2>
     <ol>
-        <li>Click "Create a new release"</li>
-        <li>Choose tag: <strong>v1.0.0</strong></li>
-        <li>Title: <strong>Mycelium v1.0.0 - Symbiosis Protocol</strong></li>
-        <li>Copy description from RELEASE_DESCRIPTION.md</li>
-        <li>Upload file: <strong>mycelium-app.exe</strong> (9.1 MB)</li>
-        <li>Mark as "Latest release"</li>
-        <li>Click "Publish release"</li>
+        <li>Удалить старый релиз v1.0.0</li>
+        <li>Создать новый релиз</li>
+        <li>ЗАГРУЗИТЬ ТОЛЬКО: mycelium-app.exe (9.1 MB)</li>
+        <li>НЕ загружать HTML файлы!</li>
     </ol>
     
-    <h2>Release Description:</h2>
-    <textarea id="description" rows="20" cols="80" readonly>
-# 🚀 **MYCELIUM v1.0.0 - SYMBIOSIS PROTOCOL**
+    <script>
+        function fixRelease() {
+            // Открыть GitHub Releases с правильными параметрами
+            const releaseUrl = 'https://github.com/kisa134/Mycelium/releases/new?tag=v1.0.0&title=Mycelium%20v1.0.0%20-%20Symbiosis%20Protocol&body=' + encodeURIComponent(getCorrectDescription());
+            window.open(releaseUrl, '_blank');
+            
+            alert('GitHub Releases открыт! ЗАГРУЗИТЕ ТОЛЬКО mycelium-app.exe (9.1 MB)!');
+        }
+        
+        function getCorrectDescription() {
+            return `# 🚀 **MYCELIUM v1.0.0 - SYMBIOSIS PROTOCOL**
 
 ## 🎉 **FIRST RELEASE**
 
@@ -36,9 +46,17 @@
 ## 📦 **DOWNLOAD**
 
 ### **Windows Executable**
-- **File:** `mycelium-app.exe`
+- **File:** \`mycelium-app.exe\`
 - **Size:** 9,553,408 bytes (9.1 MB)
 - **Platform:** Windows 10/11 (64-bit)
+- **Type:** Windows Desktop Application (.exe)
+
+---
+
+## ⚠️ **ВАЖНО: ПРАВИЛЬНЫЙ ФАЙЛ**
+
+**ЗАГРУЗИТЬ ТОЛЬКО:** \`mycelium-app.exe\` (9.1 MB)
+**НЕ загружать:** HTML файлы или веб-версии
 
 ---
 
@@ -78,7 +96,7 @@
 
 ## 🚀 **INSTALLATION**
 
-1. Download `mycelium-app.exe` (9.1 MB)
+1. Download \`mycelium-app.exe\` (9.1 MB)
 2. Place the file in any folder
 3. Double-click to run the application
 4. Click "🚀 Start Node" to join the network
@@ -88,26 +106,26 @@
 ## 🌐 **CREATING A NETWORK**
 
 ### **On the Same Computer:**
-```bash
+\`\`\`bash
 # Terminal 1:
 ./mycelium-app.exe
 
 # Terminal 2 (new window):
 ./mycelium-app.exe
-```
+\`\`\`
 
 ### **On Different Computers:**
-1. Copy `mycelium-app.exe` to the second computer
+1. Copy \`mycelium-app.exe\` to the second computer
 2. Run on both computers
 3. Nodes will automatically discover each other
 
 ### **Expected Result:**
-```
+\`\`\`
 Network Status: Connected
 Active Nodes: 2
 Your Peer ID: peer_1734701234
 Network Health: 85%
-```
+\`\`\`
 
 ---
 
@@ -180,25 +198,13 @@ Thank you to all community members for testing, feedback, and project support!
 
 **Version**: 1.0.0  
 **Release Date**: December 20, 2024  
-**Status**: Stable Release ✅
-    </textarea>
-    
-    <h2>Step 3: Copy Description</h2>
-    <button onclick="copyDescription()">Copy Description to Clipboard</button>
-    
-    <script>
-        function copyDescription() {
-            const textarea = document.getElementById('description');
-            textarea.select();
-            document.execCommand('copy');
-            alert('Description copied to clipboard!');
+**Status**: Stable Release ✅`;
         }
+        
+        // Auto-fix on page load
+        window.onload = function() {
+            setTimeout(fixRelease, 1000);
+        };
     </script>
-    
-    <h2>Step 4: Upload File</h2>
-    <p>Make sure to upload <strong>mycelium-app.exe</strong> (9.1 MB) from the root directory.</p>
-    
-    <h2>✅ Ready to Release!</h2>
-    <p>Follow the steps above to create the GitHub Release for Mycelium v1.0.0</p>
 </body>
 </html> 

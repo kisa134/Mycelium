@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.mycelium-app.app",
   "build": {
-    "beforeDevCommand": "echo 'Building frontend...'",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "echo 'Frontend ready'",
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../static"
   },
   "app": {
