@@ -23,6 +23,18 @@ enum MyEvent {
 }
 
 impl From<mdns::Event> for MyEvent {
+    /// Converts an mDNS event into our custom event type
+    /// 
+    /// This function wraps the underlying mDNS event in our custom event enum
+    /// to provide a unified event handling interface.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `event` - The mDNS event to convert
+    /// 
+    /// # Returns
+    /// 
+    /// Returns a MyEvent::Mdns variant containing the original event
     fn from(event: mdns::Event) -> Self {
         MyEvent::Mdns(event)
     }
@@ -261,16 +273,16 @@ mod tests {
         let result = RealP2PNode::new().await;
         assert!(result.is_ok(), "Failed to create P2P node: {:?}", result.err());
         
-        let (node, _receiver) = result.unwrap();
+        let (node, _receiver) = result.expect("P2P node creation should succeed");
         assert!(!node.local_peer_id.is_empty(), "Local peer ID should not be empty");
-        println!("Test passed: Created P2P node with ID: {}", node.local_peer_id);
+        log::info!("Test passed: Created P2P node with ID: {}", node.local_peer_id);
     }
 
     #[tokio::test]
     async fn test_p2p_node_start() {
-        let (mut node, _receiver) = RealP2PNode::new().await.unwrap();
+        let (mut node, _receiver) = RealP2PNode::new().await.expect("P2P node creation should succeed");
         let result = node.start().await;
         assert!(result.is_ok(), "Failed to start P2P node: {:?}", result.err());
-        println!("Test passed: P2P node started successfully");
+        log::info!("Test passed: P2P node started successfully");
     }
 } 

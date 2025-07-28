@@ -15,6 +15,16 @@ pub struct AppState {
 }
 
 impl Default for AppState {
+    /// Creates a new default AppState instance
+    /// 
+    /// This function initializes all components with their default values:
+    /// - P2P node is set to None (not running)
+    /// - System monitor is created with default configuration
+    /// - Event sender is set to None (no active sender)
+    /// 
+    /// # Returns
+    /// 
+    /// Returns a new AppState instance with all components in their default state
     fn default() -> Self {
         Self {
             p2p_node: Mutex::new(None),
@@ -167,5 +177,8 @@ pub fn run() {
             get_system_info
         ])
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .unwrap_or_else(|e| {
+            log::error!("Failed to run Tauri application: {}", e);
+            std::process::exit(1);
+        });
 }
