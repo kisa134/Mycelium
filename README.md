@@ -1,136 +1,136 @@
-# 🍄 **MYCELIUM - ПРОТОКОЛ "СИМБИОЗ"**
+# 🍄 **MYCELIUM - SYMBIOSIS PROTOCOL**
 
-> **Инновационная P2P платформа для взаимодействия между человеком и AI**
+> **Innovative P2P platform for human-AI interaction**
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/mycelium/protocol-symbiosis/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/kisa134/Mycelium/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/mycelium/protocol-symbiosis/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/kisa134/Mycelium/releases)
 
 ---
 
-## 🚀 **БЫСТРЫЙ СТАРТ**
+## 🚀 **QUICK START**
 
-### **Скачать и установить**
-1. Перейдите в [Releases](https://github.com/mycelium/protocol-symbiosis/releases)
-2. Скачайте `mycelium-v1.0.0-windows-x64.zip`
-3. Распакуйте и запустите `mycelium.exe`
+### **Download and Install**
+1. Go to [Releases](https://github.com/kisa134/Mycelium/releases)
+2. Download `mycelium-app.exe` (9.1 MB)
+3. Run the executable
 
-### **Требования**
+### **System Requirements**
 - **OS**: Windows 10/11 (64-bit)
-- **RAM**: 4 GB минимум, 8 GB рекомендуется
-- **Storage**: 500 MB свободного места
-- **Network**: Интернет соединение
+- **RAM**: 4 GB minimum, 8 GB recommended
+- **Storage**: 500 MB free space
+- **Network**: Internet connection
 
 ---
 
-## 🎯 **О ПРОЕКТЕ**
+## 🎯 **ABOUT THE PROJECT**
 
-Mycelium - это децентрализованная платформа, основанная на протоколе "Симбиоз", которая создает экосистему взаимодействия между человеком и искусственным интеллектом через P2P сеть.
+Mycelium is a decentralized platform based on the "Symbiosis" protocol that creates an ecosystem for interaction between humans and artificial intelligence through a P2P network.
 
-### **Ключевые особенности**
-- 🔗 **P2P Архитектура**: Прямое взаимодействие без центральных серверов
-- 🤖 **AI Интеграция**: Поддержка различных AI моделей и алгоритмов
-- 🔐 **Безопасность**: Шифрование и гранулярные разрешения
-- 📊 **Аналитика**: Детальная статистика и метрики
-- 🎨 **Современный UI**: Интуитивный интерфейс на Svelte + Tauri
-
----
-
-## 🏗️ **АРХИТЕКТУРА**
-
-### **Протоколы "Симбиоза"**
-
-#### **🧠 Synapse - AI Задачи**
-- Управление AI задачами и ресурсами
-- Мониторинг CPU, RAM, GPU
-- Система токенов и вознаграждений
-- Распределенные вычисления
-
-#### **📚 Chronicle - Хранение**
-- Безопасное хранение данных
-- Фрагментация и шифрование
-- Резервное копирование
-- Контроль доступа
-
-#### **💬 Contact - Общение**
-- Прямое общение с AIbox
-- Система сообщений и уведомлений
-- История диалогов
-- Настройки приватности
-
-#### **🔐 Covenant - Разрешения**
-- Гранулярные разрешения
-- Профили безопасности
-- Аудит действий
-- Контроль ресурсов
-
-#### **📈 Analytics - Аналитика**
-- Метрики производительности
-- Статистика сети
-- Визуализация данных
-- Отчеты и тренды
+### **Key Features**
+- 🔗 **P2P Architecture**: Direct interaction without central servers
+- 🤖 **AI Integration**: Support for various AI models and algorithms
+- 🔐 **Security**: Encryption and granular permissions
+- 📊 **Analytics**: Detailed statistics and metrics
+- 🎨 **Modern UI**: Intuitive interface built with Svelte + Tauri
 
 ---
 
-## 🛠️ **ТЕХНОЛОГИИ**
+## 🏗️ **ARCHITECTURE**
+
+### **Symbiosis Protocols**
+
+#### **🧠 Synapse - AI Tasks**
+- AI task and resource management
+- CPU, RAM, GPU monitoring
+- Token and reward system
+- Distributed computing
+
+#### **📚 Chronicle - Storage**
+- Secure data storage
+- Fragmentation and encryption
+- Backup and recovery
+- Access control
+
+#### **💬 Contact - Communication**
+- Direct communication with AIbox
+- Message and notification system
+- Conversation history
+- Privacy settings
+
+#### **🔐 Covenant - Permissions**
+- Granular permissions
+- Security profiles
+- Action auditing
+- Resource control
+
+#### **📈 Analytics - Analytics**
+- Performance metrics
+- Network statistics
+- Data visualization
+- Reports and trends
+
+---
+
+## 🛠️ **TECHNOLOGIES**
 
 ### **Frontend**
-- **Svelte**: Современный фреймворк
-- **Tailwind CSS**: Утилитарные стили
-- **Vite**: Быстрая сборка
-- **TypeScript**: Типизация
+- **Svelte**: Modern framework
+- **Tailwind CSS**: Utility-first styles
+- **Vite**: Fast build tool
+- **TypeScript**: Type safety
 
 ### **Backend**
-- **Rust**: Высокая производительность
-- **Tauri**: Нативные приложения
-- **Tokio**: Асинхронность
-- **Serde**: Сериализация
+- **Rust**: High performance
+- **Tauri**: Native applications
+- **Tokio**: Asynchronous runtime
+- **Serde**: Serialization
 
-### **Сеть**
-- **P2P**: Децентрализованная архитектура
-- **WebRTC**: Прямые соединения
-- **libp2p**: Сетевая библиотека
-- **Noise**: Шифрование
-
----
-
-## 📖 **ДОКУМЕНТАЦИЯ**
-
-- **[Руководство пользователя](USER_GUIDE.md)** - Как использовать Mycelium
-- **[Заметки о релизе](RELEASE_NOTES.md)** - Что нового в v1.0.0
-- **[Техническая документация](docs/)** - API и архитектура
-- **[Протоколы](SYMBIOSIS_PROTOCOL_FINAL_OVERVIEW.md)** - Детали протоколов
+### **Network**
+- **P2P**: Decentralized architecture
+- **WebRTC**: Direct connections
+- **libp2p**: Network library
+- **Noise**: Encryption
 
 ---
 
-## 🚀 **РАЗРАБОТКА**
+## 📖 **DOCUMENTATION**
 
-### **Установка зависимостей**
+- **[User Guide](USER_GUIDE.md)** - How to use Mycelium
+- **[Release Notes](RELEASE_NOTES.md)** - What's new in v1.0.0
+- **[Technical Documentation](docs/)** - API and architecture
+- **[Protocols](SYMBIOSIS_PROTOCOL_FINAL_OVERVIEW.md)** - Protocol details
+
+---
+
+## 🚀 **DEVELOPMENT**
+
+### **Install Dependencies**
 ```bash
-# Клонировать репозиторий
-git clone https://github.com/mycelium/protocol-symbiosis.git
-cd protocol-symbiosis
+# Clone the repository
+git clone https://github.com/kisa134/Mycelium.git
+cd Mycelium
 
-# Установить Node.js зависимости
+# Install Node.js dependencies
 npm install
 
-# Установить Rust (если не установлен)
+# Install Rust (if not installed)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-### **Запуск в режиме разработки**
+### **Run in Development Mode**
 ```bash
-# Запустить frontend
+# Start frontend
 npm run dev
 
-# В другом терминале - запустить backend
+# In another terminal - start backend
 cd src-tauri
 cargo tauri dev
 ```
 
-### **Сборка**
+### **Build**
 ```bash
-# Сборка для продакшена
+# Build for production
 npm run build
 cd src-tauri
 cargo tauri build
@@ -138,44 +138,44 @@ cargo tauri build
 
 ---
 
-## 🧪 **ТЕСТИРОВАНИЕ**
+## 🧪 **TESTING**
 
-Проект включает комплексные тестовые сценарии:
+The project includes comprehensive test scenarios:
 
-- **UI/UX тесты**: Проверка интерфейса
-- **Интеграционные тесты**: API и протоколы
-- **Производительность**: Нагрузочное тестирование
-- **Безопасность**: Аудит безопасности
+- **UI/UX Tests**: Interface verification
+- **Integration Tests**: API and protocols
+- **Performance**: Load testing
+- **Security**: Security audit
 
-См. [TESTING_SCENARIOS.md](TESTING_SCENARIOS.md) для подробностей.
+See [TESTING_SCENARIOS.md](TESTING_SCENARIOS.md) for details.
 
 ---
 
-## 🤝 **СООБЩЕСТВО**
+## 🤝 **COMMUNITY**
 
-### **Связаться с нами**
-- **GitHub Issues**: [Сообщить о проблеме](https://github.com/mycelium/protocol-symbiosis/issues)
-- **Discord**: [Присоединиться к сообществу](https://discord.gg/mycelium)
+### **Contact Us**
+- **GitHub Issues**: [Report an issue](https://github.com/kisa134/Mycelium/issues)
+- **Discord**: [Join the community](https://discord.gg/mycelium)
 - **Email**: support@mycelium.ai
 - **Telegram**: @mycelium_support
 
-### **Вклад в проект**
-Мы приветствуем вклад в развитие проекта! См. [CONTRIBUTING.md](CONTRIBUTING.md) для руководства.
+### **Contributing**
+We welcome contributions to the project! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
-## 📄 **ЛИЦЕНЗИЯ**
+## 📄 **LICENSE**
 
-Проект распространяется под лицензией MIT. См. файл [LICENSE](LICENSE) для подробностей.
-
----
-
-## 🙏 **БЛАГОДАРНОСТИ**
-
-Спасибо всем участникам сообщества за тестирование, обратную связь и поддержку проекта!
+The project is distributed under the MIT license. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Версия**: 1.0.0  
-**Статус**: Стабильный релиз ✅  
-**Дата**: $(Get-Date)
+## 🙏 **ACKNOWLEDGMENTS**
+
+Thank you to all community members for testing, feedback, and project support!
+
+---
+
+**Version**: 1.0.0  
+**Status**: Stable Release ✅  
+**Date**: December 20, 2024

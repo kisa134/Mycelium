@@ -81,49 +81,32 @@ async fn start_node<R: Runtime>(window: tauri::Window<R>, state: tauri::State<'_
     let event_sender = p2p_node.event_sender.clone();
     {
         let mut event_guard = state.event_sender.lock().map_err(|e| e.to_string())?;
-        *event_guard = Some(event_sender);
+        *event_guard = Some(event_sender.clone());
     }
-
-    // Start event loop in a separate task
-    let window_clone = window.clone();
-    tokio::spawn(async move {
-        while let Some(event) = event_receiver.recv().await {
-            match event {
-                P2PEvent::StatusUpdate { status_text } => {
-                    let _ = window_clone.emit("p2p_event", serde_json::json!({
-                        "type": "STATUS_UPDATE",
-                        "payload": { "status_text": status_text }
-                    }));
-                }
-                P2PEvent::NetworkStatusUpdate { status } => {
-                    // Safely serialize status to JSON with error handling
-                    match serde_json::to_value(status) {
-                        Ok(json_value) => {
-                            let _ = window_clone.emit("network-status-update", json_value);
-                        }
-                        Err(e) => {
-                            log::error!("Failed to serialize network status: {}", e);
-                            let _ = window_clone.emit("p2p_event", serde_json::json!({
-                                "type": "ERROR",
-                                "payload": { "error": format!("Failed to serialize network status: {}", e) }
-                            }));
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
-    });
 
     // Start the main event loop in a separate task
     let window_clone = window.clone();
-    let mut p2p_node_clone = p2p_node.clone();
     tokio::spawn(async move {
-        if let Err(e) = p2p_node_clone.run_event_loop().await {
-            let _ = window_clone.emit("p2p_event", serde_json::json!({
-                "type": "ERROR",
-                "payload": { "error": e.to_string() }
-            }));
+        // Real P2P event loop
+        while let Some(event) = event_receiver.recv().await {
+            let event_json = serde_json::json!({
+                "type": match &event {
+                    P2PEvent::PeerConnected { .. } => "PEER_CONNECTED",
+                    P2PEvent::PeerDisconnected { .. } => "PEER_DISCONNECTED",
+                    P2PEvent::StatusUpdate { .. } => "STATUS_UPDATE",
+                    P2PEvent::PeerCount { .. } => "PEER_COUNT",
+                    P2PEvent::NetworkStatusUpdate { .. } => "NETWORK_STATUS",
+                },
+                "payload": match &event {
+                    P2PEvent::PeerConnected { peer_id } => serde_json::json!({ "peer_id": peer_id }),
+                    P2PEvent::PeerDisconnected { peer_id } => serde_json::json!({ "peer_id": peer_id }),
+                    P2PEvent::StatusUpdate { status_text } => serde_json::json!({ "status": status_text }),
+                    P2PEvent::PeerCount { count } => serde_json::json!({ "count": count }),
+                    P2PEvent::NetworkStatusUpdate { status } => serde_json::to_value(status).unwrap(),
+                }
+            });
+            
+            let _ = window_clone.emit("p2p_event", event_json);
         }
     });
 
@@ -200,16 +183,17 @@ fn get_system_info(state: tauri::State<'_, AppState>) -> Result<SystemInfo, Stri
 /// Returns DashboardData on success, or an error message on failure
 #[tauri::command]
 async fn get_dashboard_data(state: tauri::State<'_, AppState>) -> Result<DashboardData, String> {
-    let dashboard_guard = state.dashboard_data.lock().map_err(|e| e.to_string())?;
-    
-    match &*dashboard_guard {
-        Some(data) => Ok(data.clone()),
-        None => {
-            // Generate default dashboard data if not available
-            let default_data = generate_default_dashboard_data().await;
-            Ok(default_data)
+    {
+        let dashboard_guard = state.dashboard_data.lock().map_err(|e| e.to_string())?;
+        
+        if let Some(data) = &*dashboard_guard {
+            return Ok(data.clone());
         }
     }
+    
+    // Generate default dashboard data if not available
+    let default_data = generate_default_dashboard_data().await;
+    Ok(default_data)
 }
 
 /// Updates dashboard data with new information
@@ -572,85 +556,85 @@ async fn initialize_dashboard_data(state: &tauri::State<'_, AppState>) {
 async fn generate_default_dashboard_data() -> DashboardData {
     DashboardData {
         network_status: NetworkStatus {
-            is_connected: true,
-            active_nodes: 1247,
-            total_compute_power: 15432.0,
-            network_health: 98,
-            connection_quality: ConnectionQuality::Excellent,
+            is_connected: false,
+            active_nodes: 0,
+            total_compute_power: 0.0,
+            network_health: 0,
+            connection_quality: ConnectionQuality::Poor,
         },
         node_stats: NodeStats {
-            contribution_percentage: 2.3,
-            ranking: 156,
-            reliability: 99,
-            avg_response_time: 2.3,
+            contribution_percentage: 0.0,
+            ranking: 0,
+            reliability: 0,
+            avg_response_time: 0.0,
         },
         aibox_status: AiboxStatus {
-            is_active: true,
-            mood: AiboxMood::Happy,
-            trust_level: 85,
+            is_active: false,
+            mood: AiboxMood::Neutral,
+            trust_level: 0,
             last_activity: Utc::now(),
-            current_activity: Some("Processing ML tasks".to_string()),
+            current_activity: None,
         },
         protocol_summaries: ProtocolSummaries {
             synapse: SynapseSummary {
-                active_tasks: 3,
+                active_tasks: 0,
                 available_resources: ResourceUsage {
-                    cpu_percent: 40,
-                    ram_gb: 2.1,
+                    cpu_percent: 0,
+                    ram_gb: 0.0,
                     gpu_percent: 0,
                 },
-                total_earned_tokens: 1247,
-                weekly_token_growth: 15.0,
+                total_earned_tokens: 0,
+                weekly_token_growth: 0.0,
                 network_performance: NetworkPerformance {
-                    total_compute_power: 15432.0,
-                    active_nodes: 1247,
-                    avg_completion_time: 2.3,
-                    reliability: 99,
-                    your_contribution: 2.3,
-                    your_ranking: 156,
+                    total_compute_power: 0.0,
+                    active_nodes: 0,
+                    avg_completion_time: 0.0,
+                    reliability: 0,
+                    your_contribution: 0.0,
+                    your_ranking: 0,
                 },
             },
             chronicle: ChronicleSummary {
-                allocated_storage_gb: 50.0,
-                used_storage_gb: 23.4,
-                fragment_count: 1247,
-                data_integrity: 99,
+                allocated_storage_gb: 0.0,
+                used_storage_gb: 0.0,
+                fragment_count: 0,
+                data_integrity: 0,
                 geographic_distribution: GeographicDistribution {
-                    europe: RegionInfo { percentage: 45, fragment_count: 562 },
-                    asia: RegionInfo { percentage: 32, fragment_count: 399 },
-                    america: RegionInfo { percentage: 23, fragment_count: 286 },
+                    europe: RegionInfo { percentage: 0, fragment_count: 0 },
+                    asia: RegionInfo { percentage: 0, fragment_count: 0 },
+                    america: RegionInfo { percentage: 0, fragment_count: 0 },
                 },
                 storage_security: StorageSecurity {
-                    encryption_algorithm: "AES-256-GCM".to_string(),
-                    redundancy_factor: 3,
+                    encryption_algorithm: "None".to_string(),
+                    redundancy_factor: 0,
                 },
             },
             contact: ContactSummary {
                 aibox_status: AiboxStatus {
-                    is_active: true,
-                    mood: AiboxMood::Happy,
-                    trust_level: 85,
+                    is_active: false,
+                    mood: AiboxMood::Neutral,
+                    trust_level: 0,
                     last_activity: Utc::now(),
-                    current_activity: Some("Processing ML tasks".to_string()),
+                    current_activity: None,
                 },
-                new_messages: 3,
-                urgent_messages: 1,
-                active_conversations: 2,
-                avg_response_time: "2.3 мин".to_string(),
+                new_messages: 0,
+                urgent_messages: 0,
+                active_conversations: 0,
+                avg_response_time: "0 мин".to_string(),
             },
             covenant: CovenantSummary {
                 compute: ComputeSummary {
-                    cpu_percent: 40,
-                    ram_gb: 2.1,
+                    cpu_percent: 0,
+                    ram_gb: 0.0,
                     gpu_allowed: false,
-                    max_concurrent_tasks: 5,
-                    allowed_task_types: vec![TaskType::MachineLearning, TaskType::DataProcessing],
+                    max_concurrent_tasks: 0,
+                    allowed_task_types: vec![],
                 },
                 storage: StorageSummary {
-                    max_storage_gb: 50.0,
-                    allowed_storage_types: vec![StorageType::LocalDisk],
-                    data_retention_days: 30,
-                    encryption_required: true,
+                    max_storage_gb: 0.0,
+                    allowed_storage_types: vec![],
+                    data_retention_days: 0,
+                    encryption_required: false,
                 },
                 communication: CommunicationSummary {
                     direct_communication_allowed: true,
@@ -664,24 +648,7 @@ async fn generate_default_dashboard_data() -> DashboardData {
                 },
             },
         },
-        recent_activity: vec![
-            ActivityItem {
-                id: "1".to_string(),
-                activity_type: ActivityType::TaskStarted,
-                description: "ML Model Training started".to_string(),
-                timestamp: Utc::now(),
-                aibox_id: Some("AIbox #8472".to_string()),
-                status: ActivityStatus::InProgress,
-            },
-            ActivityItem {
-                id: "2".to_string(),
-                activity_type: ActivityType::MessageReceived,
-                description: "Resource request from AIbox".to_string(),
-                timestamp: Utc::now(),
-                aibox_id: Some("AIbox #1563".to_string()),
-                status: ActivityStatus::Completed,
-            },
-        ],
+        recent_activity: vec![],
     }
 }
 

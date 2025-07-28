@@ -4,17 +4,20 @@
   "version": "0.1.0",
   "identifier": "com.mycelium-app.app",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "echo 'Building frontend...'",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../build"
+    "beforeBuildCommand": "echo 'Frontend ready'",
+    "frontendDist": "../static"
   },
   "app": {
     "windows": [
       {
-        "title": "mycelium-app",
-        "width": 800,
-        "height": 600
+        "title": "Mycelium - Protocol Symbiosis",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "minWidth": 800,
+        "minHeight": 600
       }
     ],
     "security": {
